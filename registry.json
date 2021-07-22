@@ -1,0 +1,10 @@
+{
+  "libbasis": "https://github.com/SJSU-Dev2/libbasis.git",
+  "libcore": "https://github.com/SJSU-Dev2/libcore.git",
+  "gcc-arm-none-eabi-picolibc": "https://github.com/SJSU-Dev2/gcc-arm-none-eabi-picolibc.git",
+  "liblpc40xx": "https://github.com/SJSU-Dev2/liblpc40xx.git",
+  "libstm32f10x": "https://github.com/SJSU-Dev2/libstm32f10x.git",
+  "libarmcortex": "https://github.com/SJSU-Dev2/libarmcortex.git",
+  "libmsp432p401r": "https://github.com/SJSU-Dev2/libmsp432p401r.git",
+  "libesp8266": "https://github.com/SJSU-Dev2/libesp8266.git"
+}
