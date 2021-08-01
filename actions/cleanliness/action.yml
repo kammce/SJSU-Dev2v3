@@ -1,0 +1,57 @@
+name: 'Cleanliness Check'
+description: 'Runs basic cleaniness checks for SJSU-Dev2 libraries'
+runs:
+  using: "composite"
+  steps:
+    - name: 🔎 Check "${{ github.event.repository.name }}" directory
+      shell: bash
+      run: |
+            echo "🔎 Check "${{ github.event.repository.name }}" directory"
+            test -d "${{ github.event.repository.name }}"
+
+    - name: 📥 Install libclang-11-dev (for name style check)
+      shell: bash
+      run: |
+            echo
+            echo "📥 Install libclang-11-dev (for name style check)"
+            echo
+            sudo apt install libclang-11-dev
+
+    - name: 📥 Install cpplint
+      shell: bash
+      run: |
+            echo
+            echo "📥 Install cpplint"
+            echo
+            python3 -m pip install cpplint==1.5.5
+
+    - name: 📥 Install pip package 'clang' & 'pyyaml' (for ncc)
+      shell: bash
+      run: |
+            echo
+            echo "📥 Install pip package 'clang' & 'pyyaml' (for ncc)"
+            echo
+            python3 -m pip install clang pyyaml
+
+    - name: 📃 Check Variable Names
+      shell: bash
+      run: |
+            echo
+            echo "📃 Check Variable Names"
+            echo
+            git clone https://github.com/nithinn/ncc.git ncc
+            curl https://raw.githubusercontent.com/SJSU-Dev2/SJSU-Dev2v3/main/actions/cleanliness/.naming.style > .naming.style
+            ./ncc/ncc.py --recurse \
+            --path ${{ github.event.repository.name }} \
+            --style .naming.style | tee ncc.stderr
+            [ ! -s ncc.stderr ]
+
+    - name: 🧹 Lint
+      shell: bash
+      run: |
+            echo
+            echo "🧹 Lint"
+            echo
+            curl https://raw.githubusercontent.com/SJSU-Dev2/SJSU-Dev2v3/main/actions/cleanliness/CPPLINT.cfg > CPPLINT.cfg
+            cpplint ${{ github.event.repository.name }}/*/*.cpp \
+                    ${{ github.event.repository.name }}/*/*.hpp
