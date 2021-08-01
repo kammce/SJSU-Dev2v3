@@ -1,0 +1,43 @@
+name: 'Cleanliness Check'
+description: 'Runs basic cleaniness checks for SJSU-Dev2 libraries'
+runs:
+  using: "composite"
+  steps:
+    - name: 🛎️ Checkout
+      uses: actions/checkout@v2
+
+    - name: 🛎️ Checkout NCC (naming convention checker)
+      uses: actions/checkout@v2
+      with:
+        repository: 'nithinn/ncc'
+        path: 'ncc'
+
+    - name: 🔎 Check "${{ github.event.repository.name }}" directory
+      shell: bash
+      run: test -d "${{ github.event.repository.name }}"
+
+    - name: 📥 Install libclang-11-dev (for name style check)
+      shell: bash
+      run: sudo apt install libclang-11-dev
+
+    - name: 📥 Install cpplint
+      shell: bash
+      run: python3 -m pip install cpplint==1.5.5
+
+    - name: 📥 Install pip package 'clang' & 'pyyaml' (for ncc)
+      shell: bash
+      run: python3 -m pip install clang pyyaml
+
+    - name: 🧹 Lint
+      shell: bash
+      run: |
+            cpplint ${{ github.event.repository.name }}/*/*.cpp \
+                    ${{ github.event.repository.name }}/*/*.hpp
+
+    - name: 📃 Check Variable Names
+      shell: bash
+      run: |
+            ./ncc/ncc.py --recurse \
+            --path ${{ github.event.repository.name }} \
+            --style .naming.style | tee ncc.stderr
+            [ ! -s ncc.stderr ]

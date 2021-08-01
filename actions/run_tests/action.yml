@@ -1,0 +1,38 @@
+name: 'Run Tests'
+description: 'Runs automated tests for SJSU-Dev2 libraries'
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v2
+    - name: 🐍 Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: 📥 Install GCC 11
+      shell: bash
+      run: |
+            sudo add-apt-repository 'deb http://mirrors.kernel.org/ubuntu hirsute main universe'
+            sudo apt update
+            sudo apt install g++-11
+
+    - name: 📥 Install Sammy
+      shell: bash
+      run: python3 -m pip install --user --upgrade sammy-sjsu-dev2
+
+    - name: ✨ Create new project
+      shell: bash
+      run: sammy start project
+
+    - name: 📦 Install ${{ github.repository }} library
+      shell: bash
+      working-directory: project
+      run: |
+            HEAD_REF=${{ github.head_ref }}
+            BRANCH=${HEAD_REF:="main"}
+            sammy install --tag "$BRANCH" "https://github.com/${{ github.repository }}.git"
+
+    - name: 🧪 Run Tests
+      shell: bash
+      working-directory: project/packages/${{ github.event.repository.name }}
+      run: sammy build-test -r "tests/unity.test.cpp" -c "g++-11"
